@@ -3,8 +3,11 @@
  * Status	In Progress
  *
  * @author	Alaina Iris
- * @version	01.12.2025
+ * @version	01.14.2025
  */
+
+import java.util.Random;
+
 public final class ArrayMethods {
 	// Prevent Instantiation
 	private ArrayMethods() {}
@@ -81,7 +84,7 @@ public final class ArrayMethods {
 	 * @param  number Number to find
 	 * @return Location of number
 	 */
-	public int binarySearch(int[] arr, int number) {
+	public static int binarySearch(int[] arr, int number) {
 		int high = arr.length - 1;
 		int low = 0;
 		while (low <= high) {
@@ -146,7 +149,7 @@ public final class ArrayMethods {
 		for (int i = 1; i < arr.length; i++) {
 			int insertion = arr[i];
 			int location = i - 1;
-			while (arr[location] > insertion) {
+			while (location >= 0 && arr[location] > insertion) {
 				arr[location + 1] = arr[location];
 				location--;
 			}
@@ -233,21 +236,24 @@ public final class ArrayMethods {
 	 */
 	public static int quickSortPartition(int[] arr, int low, int high) {
 		int swapLocation = arr[low];
-		int i = low;
-		int j = high;
+		int i = low - 1;
+		int j = high + 1;
 		int swap;
 		while (i < j) {
-			while (arr[i] < swapLocation) {
+			do {
 				i++;
-			}
-			while (arr[j] > swapLocation) {
+			} while (arr[i] < swapLocation);
+			do {
 				j--;
+			} while (arr[j] > swapLocation);
+			if (i >= j) {
+				return j;
 			}
 			swap = arr[i];
 			arr[i] = arr[j];
 			arr[j] = swap;
 		}
-		return j;
+		return 0;
 	}
 
 	/**
@@ -350,6 +356,57 @@ public final class ArrayMethods {
 		for (int i = 1; max / i > 0; i *= base) {
 			radixSortDigit(arr, i, base);
 		}
+	}
+
+	/**
+         * Return if array is sorted (in ascending order)
+         *
+         * @param  array Array to check
+         * @return Is array sorted
+         */
+        public static boolean isSorted(int[] arr) {
+                for (int i = 1; i < arr.length; i++) {
+                        if (arr[i] < arr[i - 1]) {
+                                return false;
+                        }
+                }
+                return true;
+        }
+
+        /**
+         * Generate a random array
+         *
+         * @param  length Array length
+         * @param  min Minimum value
+         * @param  max Maximum value (exclusive)
+         * @return Randomized array
+         */
+        public static int[] randomArray(int length, int min, int max) {
+                int[] array = new int[length];
+                Random rand = new Random();
+                for (int i = 0; i < length; i++) {
+                        array[i] = rand.nextInt(max - min) + min;
+                }
+                return array;
+        }
+	
+	/**
+	 * Generate a random sorted array
+	 *
+	 * @param  length Array length
+	 * @param  min Minimum value
+	 * @param  max Maximum value (exclusive)
+	 * @return Randomized array
+	 */
+	public static int[] randomSortedArray(int length, int min, int max) {
+		int[] array = new int[length];
+		Random rand = new Random();
+		int last = min;
+		for (int i = 0; i < length; i++) {
+			last = rand.nextInt((max - min) / length) + (max - min) / length * i + min;
+			array[i] = last;
+		}
+		return array;
 	}
 
 	/**
