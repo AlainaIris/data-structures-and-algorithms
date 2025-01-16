@@ -31,8 +31,33 @@ public class Tester {
 		nodes.add(n6);
 		ArrayList<Edge> edges = new ArrayList<Edge>();
 		edges.add(new Edge.Builder().newEdge(n1, n2).build());
+		edges.add(new Edge.Builder().newEdge(n2, n5).build());
+		edges.add(new Edge.Builder().newEdge(n1, n6).build());
+		edges.add(new Edge.Builder().newEdge(n6, n4).build());
+		edges.add(new Edge.Builder().newEdge(n5, n3).build());
 		Graph graph = new Graph<Person>();
 		graph.addNodes(nodes);
 		graph.addEdges(edges);
+		/**
+		        |---Ally---Frank---Dan
+		  Beth -|
+			|---Emily---Cathy
+		*/
+		ArrayList<Node> dfsPath = graph.traverseDFSPath(n2);
+		ArrayList<Node> bfsPath = graph.traverseBFSPath(n2);
+		for (Node n : dfsPath) {
+			System.out.print(n + " ");
+		}
+		System.out.println("");
+		for (Node n : bfsPath) {
+			System.out.print(n + " ");
+		}
+		System.out.println("");
+		ArrayList<Node> path = graph.getShortestPath(n4, n3);
+		if (path != null) {
+			for (Node n : path) {
+				System.out.print(n + " ");
+			}
+		}
 	}
 }

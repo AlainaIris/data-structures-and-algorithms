@@ -63,6 +63,15 @@ public class Edge {
 	}
 
 	/**
+	 * Get pretty string for edge
+	 *
+	 * @return Pretty string
+	 */
+	public String toString() {
+		return node1 + " to " + node2;
+	}
+
+	/**
 	 * Implement edge builder class to handle optional
 	 * parameters of weight and directed edge
 	 */
@@ -82,6 +91,8 @@ public class Edge {
 		public Builder newEdge(Node node1, Node node2) {
 			setFirstNode(node1);
 			setSecondNode(node2);
+			directed = false;
+			weight = 1;
 			return this;
 		}
 

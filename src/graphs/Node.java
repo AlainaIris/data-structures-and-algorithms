@@ -6,7 +6,7 @@
  * @version	01.15.2025
  */
 import java.util.ArrayList;
-
+import java.util.HashSet;
 public class Node<T> {
 	private T value;
 	private ArrayList<Edge> adj;
@@ -28,6 +28,45 @@ public class Node<T> {
 	 */
 	public ArrayList<Edge> getAdjacent() {
 		return adj;
+	}
+
+	/**
+	 * Get adjacent nodes
+	 *
+	 * @return Adjacent nodes
+	 */
+	public HashSet<Node> getAdjacentNodes() {
+		HashSet<Node> nodes = new HashSet<Node>();
+		for (Edge e : adj) {
+			if (e.getSecondNode() != this) {
+				nodes.add(e.getSecondNode());
+			} else if (e.getFirstNode() != this) {
+				nodes.add(e.getFirstNode());
+			}
+		}
+		return nodes;
+	}
+
+	/**
+	 * Get cheapest edge connection to another node
+	 *
+	 * @param  node Node to connect to
+	 * @return Cheapest value (or -1)
+	 */
+	public int getCheapestConnection(Node node) {
+		int min = Integer.MAX_VALUE;
+		boolean connected = false;
+		for (Edge e : adj) {
+			Node first = e.getFirstNode();
+			Node second = e.getSecondNode();
+			if (((first == this && second == node) ||
+			    (second == this && first == node))
+			    && e.getWeight() <= min) {
+				min = e.getWeight();
+				connected = true;
+			}
+		}
+		return connected ? min : -1;
 	}
 
 	/**
