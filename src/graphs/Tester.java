@@ -35,16 +35,16 @@ public class Tester {
 		edges.add(new Edge.Builder().newEdge(n1, n6).build());
 		edges.add(new Edge.Builder().newEdge(n6, n4).build());
 		edges.add(new Edge.Builder().newEdge(n5, n3).build());
-		Graph graph = new Graph<Person>();
-		graph.addNodes(nodes);
-		graph.addEdges(edges);
+		NodeGraph nodeGraph = new NodeGraph<Person>();
+		nodeGraph.addNodes(nodes);
+		nodeGraph.addEdges(edges);
 		/**
 		        |---Ally---Frank---Dan
 		  Beth -|
 			|---Emily---Cathy
 		*/
-		ArrayList<Node> dfsPath = graph.traverseDFSPath(n2);
-		ArrayList<Node> bfsPath = graph.traverseBFSPath(n2);
+		ArrayList<Node> dfsPath = nodeGraph.traverseDFSPath(n2);
+		ArrayList<Node> bfsPath = nodeGraph.traverseBFSPath(n2);
 		for (Node n : dfsPath) {
 			System.out.print(n + " ");
 		}
@@ -53,11 +53,29 @@ public class Tester {
 			System.out.print(n + " ");
 		}
 		System.out.println("");
-		ArrayList<Node> path = graph.getShortestPath(n4, n3);
+		ArrayList<Node> path = nodeGraph.getShortestPath(n4, n3);
 		if (path != null) {
 			for (Node n : path) {
 				System.out.print(n + " ");
 			}
+		}
+		Graph g = new Graph(3, 4);
+		System.out.println(g);
+		g.aStarPath(new int[] {0, 0}, new int[] {2, 3});
+		int[][] grid = { { 1, -1, 1, 1, 1, 1, -1, 1, 1, 1 },
+                         { 1, 1, 1, -1, 1, 1, 1, -1, 1, 1 },
+                         { 1, 1, 1, -1, 1, 1, -1, 1, -1, 1 },
+                         { -1, -1, 1, -1, 1, -1, -1, -1, -1, 1 },
+                         { 1, 1, 1, -1, 1, 1, 1, -1, 1, -1 },
+                         { 1, -1, 1, 1, 1, 1, -1, 1, -1, -1 },
+                         { 1, -1, -1, -1, -1, 1, -1, -1, -1, 1 },
+                         { 1, -1, 1, 1, 1, 1, -1, 1, 1, 1 },
+                         { 1, 1, 1, -1, -1, -1, 1, -1, -1, 1 }};
+
+		Graph g2 = new Graph(grid);
+		ArrayList<Integer[]> pathing = g2.aStarPath(new int[] {0, 0}, new int[] {8, 9});
+		for (Integer[] location : pathing) {
+			System.out.println(location[0] + ", " + location[1]);
 		}
 	}
 }

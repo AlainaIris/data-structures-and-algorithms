@@ -1,240 +1,239 @@
 /**
- * Purpose	Graph implementation (weighted, unweighted, directed, etc.)
- * Status	In Progress
+ * Purpose	2D graph implementation
+ * Status	In progress
  *
  * @author	Alaina Iris
- * @version	01.15.2025
+ * @version	01.16.25
  */
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.Comparator;
 import java.util.ArrayList;
-import java.util.Stack;
-import java.util.ArrayDeque;
-import java.util.Collections;
+import java.util.PriorityQueue;
+import java.lang.Math;
 
-public class Graph<T> {
-	private HashSet<Node<T>> verts; // Unique verticies
-	
-	public Graph() {
-		verts = new HashSet<Node<T>>();
+public class Graph {
+	private int[][] graph;
+	private int[][] movements;
+	/**
+	 * Construct a new graph that is m rows and n columns
+	 *
+	 * @param  m Rows
+	 * @param  n Columns
+	 */
+	public Graph(int m, int n) {
+		graph = new int[m][n];
+		movements = new int[8][];
+		movements[0] = new int[] {1, 1};
+		movements[1] = new int[] {1, 0};
+		movements[2] = new int[] {1, -1};
+		movements[3] = new int[] {0, 1};
+		movements[4] = new int[] {0, -1};
+		movements[5] = new int[] {-1, 1};
+		movements[6] = new int[] {-1, 0};
+		movements[7] = new int[] {-1, -1};
+	}
+
+	public Graph(int[][] graph) {
+		this.graph = graph;
+		movements = new int[8][];
+		movements[0] = new int[] {1, 1};
+                movements[1] = new int[] {1, 0};
+                movements[2] = new int[] {1, -1};
+                movements[3] = new int[] {0, 1};
+                movements[4] = new int[] {0, -1};
+                movements[5] = new int[] {-1, 1};
+                movements[6] = new int[] {-1, 0};
+                movements[7] = new int[] {-1, -1};
 	}
 
 	/**
-	 * Attempt to add a node to the list of verticies
+	 * Return if location exists in the graph
 	 *
-	 * @param  node Node to add
-	 * @throws IllegalArgumentException When node doesn't exist
+	 * @param  location Location to check
+	 * @return If exists
 	 */
-	public void addNode(Node<T> node) throws IllegalArgumentException {
-		if (node != null) {
-			verts.add(node);
-		} else {
-			throw new IllegalArgumentException("Nodes must not be null");
-		}
+	private boolean isValidLocation(int[] location) {
+		return (location.length == 2 &&
+			location[0] >= 0 && location[0] < graph.length &&
+			location[1] >= 0 && location[1] < graph[0].length);
 	}
 
 	/**
-	 * Attempt to add a set of nodes
+	 * Return if location is blocked
 	 *
-	 * @param  nodes Set of nodes
+	 * @param  location Location to check
+	 * @return If blocked
+	 * @throws IllegalArgumentException If invalid location
 	 */
-	public void addNodes(HashSet<Node<T>> nodes) {
-		for (Node<T> node : nodes) {
-			try {
-				addNode(node);
-			} catch (IllegalArgumentException e) {
-				System.out.println("Addition of node: " + node + " failed");
-				System.out.println(e);
-			}
+	private boolean isBlocked(int[] location) {
+		if (!isValidLocation(location)) {
+			return true;
 		}
+		return graph[location[0]][location[1]] == -1;
 	}
 
 	/**
-	 * Attempt to add edge to graph
+	 * Return if pathing is valid
 	 *
-	 * @param  edge Edge to add
-	 * @throws IllegalArgumentException When edge is invalid
+	 * @param  start Start location
+	 * @param  end End location
+	 * @return Valid pathing
 	 */
-	public void addEdge(Edge edge) throws IllegalArgumentException {
-		if (edge == null) {                        
-			throw new IllegalArgumentException("Nodes must not be null");
-		} else if (containsNode(edge.getFirstNode()) &&
-			   containsNode(edge.getSecondNode())) {
-			edge.getFirstNode().addEdge(edge);
-			if (!edge.directed()) {
-				edge.getSecondNode().addEdge(edge);
-			}
-		} else {
-			throw new IllegalArgumentException("Edges can only use nodes already within the network");
-		}
+	private boolean validPathing(int[] start, int[] end) {
+		return isValidLocation(start) && isValidLocation(end) &&
+		    	!isBlocked(start) && !isBlocked(end);
 	}
 
 	/**
-	 * Attempt to add a list of edges
+	 * Get the distance between two points
 	 *
-	 * @param  edges Edges to add
+	 * @param  p1 First point
+	 * @param  p2 Second point
+	 * @return Distance between points
 	 */
-	public void addEdges(ArrayList<Edge> edges) {
-		for (Edge edge : edges) {
-			try {
-				addEdge(edge);
-			} catch (IllegalArgumentException e) {
-				System.out.println("Addition of edge: " + edge + " failed");
-				System.out.println(e);
-			}
-		}
+	private double getDistance(int[] p1, int[] p2) {
+		int x = p1[0] - p2[0];
+		int y = p1[1] - p2[1];
+		return Math.sqrt(x * x + y * y);
 	}
 
 	/**
-	 * DFS traversal path
+	 * Heuristic for remaining distance to end goal in 8 directions
+	 * Used in A* implementation
 	 *
-	 * @param  start Start node
-	 * @return Traversal path (does not include disjoint pathing)
+	 * @param  start Start
+	 * @param  end End
+	 * @return Estimate for distance
 	 */
-	public ArrayList<Node> traverseDFSPath(Node start) {
-                ArrayList<Node> visited = new ArrayList<Node>();
-                Stack<Node> stack = new Stack<Node>();
-                stack.push(start);
-                while (!stack.isEmpty()) {
-                        Node pos = stack.pop();
-                        if (visited.contains(pos)) {
-                                continue;
-                        }
-                        visited.add(pos);
-                        for (Edge edge : (ArrayList<Edge>) pos.getAdjacent()) {
-                                Node adj;
-                                if (edge.getSecondNode() != pos) {
-                                        adj = edge.getSecondNode();
-                                } else if (edge.getFirstNode() != pos) {
-                                        adj = edge.getFirstNode();
-                                } else {
-                                        continue;
-                                }
-                                if (!visited.contains(adj)) {
-                                        stack.push(adj);
-                                }
-                        }
-                }
-                return visited;
+	private double estimateDistance(int[] start, int[] end) {
+		int changeX = Math.abs(start[0] - end[0]);
+		int changeY = Math.abs(start[1] - end[1]);
+		int minChange = changeX > changeY ? changeY : changeX;
+		return changeX + changeY + (Math.sqrt(2) - 2) * minChange;
 	}
 
 	/**
-	 * BFS traversal path
+	 * Reconstruct path found via A* search
 	 *
-	 * @param  start Start node
-	 * @return Traversal path (does not include disjoint pathing)
+	 * @param  cells Cell chart
+	 * @param  start Start location
+	 * @param  end End location
+	 * @return Path to get to location
 	 */
-	public ArrayList<Node> traverseBFSPath(Node start) {
-                ArrayList<Node> visited = new ArrayList<Node>();
-                ArrayDeque<Node> queue = new ArrayDeque<Node>();
-                queue.add(start);
-                while (!queue.isEmpty()) {
-                        Node pos = queue.remove();
-			if (visited.contains(pos)) {
-				continue;
-			}
-			visited.add(pos);
-                        for (Edge edge : (ArrayList<Edge>) pos.getAdjacent()) {
-                                Node adj;
-                                if (edge.getSecondNode() != pos) {
-                                        adj = edge.getSecondNode();
-                                } else if (edge.getFirstNode() != pos) {
-                                        adj = edge.getFirstNode();
-                                } else {
-					continue;
-				}
-                                if (!visited.contains(adj)) {
-                                        queue.add(adj);
-                                }
-                        }
-                }
-                return visited;
-	}
-	
-	private int indexOf(Node[] array, Node value) {
-		for (int i = 0; i < array.length; i++) {
-			if (array[i] == value) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	/**
-	 * Shortest path via Dijkstra's Algorithm
-	 *
-	 * @param  start Start node
-	 * @param  end End node
-	 * @return Path from end to start
-	 */
-	public ArrayList<Node> getShortestPath(Node start, Node end) {
-		HashSet<Integer> set = new HashSet<Integer>();
-		int[] distances = new int[verts.size()];
-		Node[] previous = new Node[verts.size()];
-		Node[] order = new Node[verts.size()]; // Node id
-		int i = 0;
-		for (Node node : verts) {
-			set.add(i);
-			order[i] = node;
-			distances[i] = Integer.MAX_VALUE;
-			previous[i] = null;
-			i++;
-		}
-		distances[indexOf(order, start)] = 0;
-		while (!set.isEmpty()) {
-			int min = Integer.MAX_VALUE;
-			int minIndex = 0;
-			for (Integer index : set) {
-				if (distances[index] <= min) {
-					minIndex = index;
-					min = distances[index];
-				}
-			}
-			Node location = order[minIndex];
-			if (location == end) {
-				break;
-			}
-			set.remove(minIndex);
-			HashSet<Node> neighbors = location.getAdjacentNodes();
-			for (Node node : neighbors) {
-				if (!set.contains(indexOf(order, node))) {
-					continue;
-				} else {
-					i = indexOf(order, node);
-					int newWeight = distances[minIndex] + location.getCheapestConnection(node);
-					if (newWeight < distances[i]) {
-						distances[i] = newWeight;
-						previous[i] = location;
-					}
-				}
-			}
-		}
-		ArrayList<Node> path = new ArrayList<Node>();
-		Node location = previous[indexOf(order, end)];
-		if (location == null) {
-			return null;
-		} else {
-			path.add(end);
-			while (location != start) {
-				path.add(location);
-				if (indexOf(order, location) != -1) {
-					location = previous[indexOf(order, location)];
-				} else {
-					break;
-				}
-			}
-			path.add(start);
+	public ArrayList<Integer[]> buildPath(Cell[][] cells, int[] start, Cell end) {
+		ArrayList<Integer[]> path = new ArrayList<Integer[]>();
+		Integer[] location = new Integer[] { end.row, end.col };
+		path.add(location);
+		while (location[0] != start[0] || location[1] != start[1]) {
+			Cell cell = cells[location[0]][location[1]];
+			location = new Integer[] { cell.past_row, cell.past_col };
+			path.add(0, location);
 		}
 		return path;
 	}
 
 	/**
-	 * Check if node is included in graph
+	 * A* algorithm implementation
 	 *
-	 * @param  node Node to check
-	 * @return If node is included
+	 * @param  start Start location
+	 * @param  end End location
+	 * @return Shortest path
 	 */
-	public boolean containsNode(Node node) {
-		return verts.contains(node);
+	public ArrayList<Integer[]> aStarPath(int[] start, int[] end) {
+		if (graph.length < 1 || graph[0].length < 1) {
+			throw new IllegalArgumentException("Graph must have cells");
+		} else if (!validPathing(start, end)) {
+			throw new IllegalArgumentException("Please enter a valid start and end");
+		}
+		int rows = graph.length;
+		int cols = graph[0].length;
+		Cell[][] cellInfo = new Cell[rows][cols]; // Minimal paths
+		boolean[][] closedVisits = new boolean[rows][cols];
+		for (int i = 0; i < cellInfo.length; i++) {
+			for (int j = 0; j < cellInfo[i].length; j++) {
+				cellInfo[i][j] = new Cell(i, j);
+			}
+		}
+		// Initialize start cell as base case
+		Cell startCell = cellInfo[start[0]][start[1]];
+		startCell.total = 0;
+		startCell.dist = 0;
+		startCell.dist_left = 0;
+		startCell.past_row = start[0];
+		startCell.past_col = start[1];
+		
+		Comparator<Cell> cellCompare = (c1, c2) -> Double.compare(c1.total, c2.total);
+		PriorityQueue<Cell> queue = new PriorityQueue<Cell>(cellCompare);
+		queue.add(startCell);
+		int[] still = new int[] {0, 0};
+		while (!queue.isEmpty()) {
+			Cell location = queue.poll();
+			if (location.row == end[0] && location.col == end[1]) {
+				return buildPath(cellInfo, start, location);
+			}
+			for (int[] dir : movements) {
+				double moveDist = getDistance(still, dir);
+				double newDist = moveDist + location.dist;
+				int[] newLocation = new int [] {
+					location.row + dir[0],
+					location.col + dir[1]
+				};
+				if (isBlocked(newLocation)) {
+					continue;
+				}
+				double newDistLeft = estimateDistance(newLocation, end);
+				double newTotal = newDist + newDistLeft;
+				Cell prior = cellInfo[newLocation[0]][newLocation[1]];
+				if (newTotal < prior.total) {
+					prior.total = newTotal;
+					prior.past_row = location.row;
+					prior.past_col = location.col;
+					prior.dist = newDist;
+					prior.dist_left = newDistLeft;
+					queue.add(prior);
+				}
+
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Get the graph as a string
+	 *
+	 * @return String graph
+	 */
+	public String toString() {
+		String str = "";
+		for (int[] row : graph) {
+			for (int col : row) {
+				str = str + col + " ";
+			}
+			str = str + "\n";
+		}
+		return str;
+	}
+
+	public class Cell {
+		public int past_row;
+		public int past_col;
+		public int col;
+		public int row;
+		public double dist;
+		public double dist_left;
+		public double total;
+		public Cell(int row, int col) {
+			past_row = -1;
+			past_col = -1;
+			dist = Double.MAX_VALUE;
+			dist_left = Double.MAX_VALUE;
+			total = Double.MAX_VALUE;
+			this.row = row;
+			this.col = col;
+		}
+		public String toString() {
+			return "" + past_row + "," + past_col + " | " + dist
+				+ "," + dist_left + " | " + total;
+		}
 	}
 }
