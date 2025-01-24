@@ -115,6 +115,8 @@ public class Stack<T> {
 		for (int i = 0; i < size; i++) {
 			builder.append(values[i] + " ");
 		}
+		builder.insert(0, "Values: ");
+		builder.append("\nSize: " + size);
 		return builder.toString();
 	}
 }
