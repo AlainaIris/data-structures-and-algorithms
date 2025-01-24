@@ -253,7 +253,7 @@ public final class ArrayMethods {
 			arr[i] = arr[j];
 			arr[j] = swap;
 		}
-		return 0;
+		return -1;
 	}
 
 	/**

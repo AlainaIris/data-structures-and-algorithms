@@ -42,6 +42,70 @@ public class Tree {
 	}
 
 	/**
+	 * Recurrsive method for getting maximum value of subtree
+	 *
+	 * @param  node Subtree root
+	 * @return Maximum value
+	 */
+	private int maxNodeValue(Node node) {
+		int max = node.value;
+		if (node.left != null) {
+			int leftMax = maxNodeValue(node.left);
+			if (leftMax > max) {
+				max = leftMax;
+			}
+		}
+		if (node.right != null) {
+			int rightMax = maxNodeValue(node.right);
+			if (rightMax > max) {
+				max = rightMax;
+			}
+		}
+		return max;
+	}
+
+	/**
+	 * Get the maximum node value
+	 *
+	 * @return Maximum node value
+	 */
+	public int maxValue() {
+		return maxNodeValue(root);
+	}
+
+	/**
+	 * Recurrsively get the minimum value of a subtree
+	 *
+	 * @param  node Subtree root
+	 * @return Subtree minimum
+	 */
+	private int minNodeValue(Node node) {
+		int min = node.value;
+		if (node.left != null) {
+			int leftMin = minNodeValue(node.left);
+			if (leftMin < min) {
+				min = leftMin;
+			}
+		}
+		if (node.right != null) {
+			int rightMin = minNodeValue(node.right);
+			if (rightMin < min) {
+				min = rightMin;
+			}
+		}
+		return min;
+	}
+
+	/**
+	 * Get minimum value in the tree
+	 * 
+	 * @return Minimum value
+	 */
+	public int minValue() {
+		return minNodeValue(root);
+	}
+
+	/**
 	 * Recurssively construct in order traversal
 	 *
 	 * @param  node Subtree root

@@ -59,23 +59,20 @@ public class Tester {
 				System.out.print(n + " ");
 			}
 		}
-		Graph g = new Graph(3, 4);
-		System.out.println(g);
-		g.aStarPath(new int[] {0, 0}, new int[] {2, 3});
-		int[][] grid = { { 1, -1, 1, 1, 1, 1, -1, 1, 1, 1 },
-                         { 1, 1, 1, -1, 1, 1, 1, -1, 1, 1 },
-                         { 1, 1, 1, -1, 1, 1, -1, 1, -1, 1 },
-                         { -1, -1, 1, -1, 1, -1, -1, -1, -1, 1 },
-                         { 1, 1, 1, -1, 1, 1, 1, -1, 1, -1 },
-                         { 1, -1, 1, 1, 1, 1, -1, 1, -1, -1 },
-                         { 1, -1, -1, -1, -1, 1, -1, -1, -1, 1 },
-                         { 1, -1, 1, 1, 1, 1, -1, 1, 1, 1 },
-                         { 1, 1, 1, -1, -1, -1, 1, -1, -1, 1 }};
-
-		Graph g2 = new Graph(grid);
-		ArrayList<Integer[]> pathing = g2.aStarPath(new int[] {0, 0}, new int[] {8, 9});
+        	int[][] grid = { { 1, 0, 1, 1, 1, 1, 0, 1, 1, 1 },
+                	         { 1, 1, 1, 0, 1, 1, 1, 0, 1, 1 },
+                        	 { 1, 1, 1, 0, 1, 1, 0, 1, 0, 1 },
+	                         { 0, 0, 1, 0, 1, 0, 0, 0, 0, 1 },
+        	                 { 1, 1, 1, 0, 1, 1, 1, 0, 1, 0 },
+                	         { 1, 0, 1, 1, 1, 1, 0, 1, 0, 0 },
+                        	 { 1, 0, 0, 0, 0, 1, 0, 0, 0, 1 },
+    	                    	 { 1, 0, 1, 1, 1, 1, 0, 1, 1, 1 },
+        	                 { 1, 1, 1, 0, 0, 0, 1, 0, 0, 1 } };
+		Grid g = new Grid(grid);
+		ArrayList<Integer[]> pathing = g.aStarPath(new int[] {0, 0}, new int[] {8, 9});
 		for (Integer[] location : pathing) {
 			System.out.println(location[0] + ", " + location[1]);
 		}
+		System.out.println(g);
 	}
 }

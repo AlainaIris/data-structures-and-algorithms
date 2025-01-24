@@ -20,6 +20,8 @@ public class Tester {
 		System.out.println(tree.depthFirstFound(2));
 		System.out.println(tree.breadthFirstFound(8));
 		System.out.println(tree.getHeight());
+		System.out.println(tree.maxValue());
+		System.out.println(tree.minValue());
 		ArrayList<Integer> list = tree.inOrderTraversalAsList();
 		for (int i : list) {
 			System.out.print(i + " ");

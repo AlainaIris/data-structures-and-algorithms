@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.lang.Math;
 
-public class Graph {
-	private int[][] graph;
+public class Grid {
+	private int[][] grid;
 	private int[][] movements;
 	/**
 	 * Construct a new graph that is m rows and n columns
@@ -20,8 +20,8 @@ public class Graph {
 	 * @param  m Rows
 	 * @param  n Columns
 	 */
-	public Graph(int m, int n) {
-		graph = new int[m][n];
+	public Grid(int m, int n) {
+		grid = new int[m][n];
 		movements = new int[8][];
 		movements[0] = new int[] {1, 1};
 		movements[1] = new int[] {1, 0};
@@ -33,8 +33,8 @@ public class Graph {
 		movements[7] = new int[] {-1, -1};
 	}
 
-	public Graph(int[][] graph) {
-		this.graph = graph;
+	public Grid(int[][] grid) {
+		this.grid = grid;
 		movements = new int[8][];
 		movements[0] = new int[] {1, 1};
                 movements[1] = new int[] {1, 0};
@@ -54,8 +54,8 @@ public class Graph {
 	 */
 	private boolean isValidLocation(int[] location) {
 		return (location.length == 2 &&
-			location[0] >= 0 && location[0] < graph.length &&
-			location[1] >= 0 && location[1] < graph[0].length);
+			location[0] >= 0 && location[0] < grid.length &&
+			location[1] >= 0 && location[1] < grid[0].length);
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class Graph {
 		if (!isValidLocation(location)) {
 			return true;
 		}
-		return graph[location[0]][location[1]] == -1;
+		return grid[location[0]][location[1]] == 0;
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class Graph {
 		path.add(location);
 		while (location[0] != start[0] || location[1] != start[1]) {
 			Cell cell = cells[location[0]][location[1]];
-			location = new Integer[] { cell.past_row, cell.past_col };
+			location = new Integer[] { cell.pastRow, cell.pastCol };
 			path.add(0, location);
 		}
 		return path;
@@ -140,13 +140,13 @@ public class Graph {
 	 * @return Shortest path
 	 */
 	public ArrayList<Integer[]> aStarPath(int[] start, int[] end) {
-		if (graph.length < 1 || graph[0].length < 1) {
+		if (grid.length < 1 || grid[0].length < 1) {
 			throw new IllegalArgumentException("Graph must have cells");
 		} else if (!validPathing(start, end)) {
 			throw new IllegalArgumentException("Please enter a valid start and end");
 		}
-		int rows = graph.length;
-		int cols = graph[0].length;
+		int rows = grid.length;
+		int cols = grid[0].length;
 		Cell[][] cellInfo = new Cell[rows][cols]; // Minimal paths
 		boolean[][] closedVisits = new boolean[rows][cols];
 		for (int i = 0; i < cellInfo.length; i++) {
@@ -158,9 +158,9 @@ public class Graph {
 		Cell startCell = cellInfo[start[0]][start[1]];
 		startCell.total = 0;
 		startCell.dist = 0;
-		startCell.dist_left = 0;
-		startCell.past_row = start[0];
-		startCell.past_col = start[1];
+		startCell.distLeft = 0;
+		startCell.pastRow = start[0];
+		startCell.pastCol = start[1];
 		
 		Comparator<Cell> cellCompare = (c1, c2) -> Double.compare(c1.total, c2.total);
 		PriorityQueue<Cell> queue = new PriorityQueue<Cell>(cellCompare);
@@ -186,10 +186,10 @@ public class Graph {
 				Cell prior = cellInfo[newLocation[0]][newLocation[1]];
 				if (newTotal < prior.total) {
 					prior.total = newTotal;
-					prior.past_row = location.row;
-					prior.past_col = location.col;
+					prior.pastRow = location.row;
+					prior.pastCol = location.col;
 					prior.dist = newDist;
-					prior.dist_left = newDistLeft;
+					prior.distLeft = newDistLeft;
 					queue.add(prior);
 				}
 
@@ -199,41 +199,41 @@ public class Graph {
 	}
 
 	/**
-	 * Get the graph as a string
+	 * Get the grid as a string
 	 *
-	 * @return String graph
+	 * @return String grid
 	 */
 	public String toString() {
 		String str = "";
-		for (int[] row : graph) {
+		for (int[] row : grid) {
 			for (int col : row) {
-				str = str + col + " ";
+				str += (col == 0 ? "██" : "  ");
 			}
-			str = str + "\n";
+			str += "\n";
 		}
 		return str;
 	}
 
 	public class Cell {
-		public int past_row;
-		public int past_col;
+		public int pastRow;
+		public int pastCol;
 		public int col;
 		public int row;
 		public double dist;
-		public double dist_left;
+		public double distLeft;
 		public double total;
 		public Cell(int row, int col) {
-			past_row = -1;
-			past_col = -1;
+			pastRow = -1;
+			pastCol = -1;
 			dist = Double.MAX_VALUE;
-			dist_left = Double.MAX_VALUE;
+			distLeft = Double.MAX_VALUE;
 			total = Double.MAX_VALUE;
 			this.row = row;
 			this.col = col;
 		}
 		public String toString() {
-			return "" + past_row + "," + past_col + " | " + dist
-				+ "," + dist_left + " | " + total;
+			return "" + pastRow + "," + pastCol + " | " + dist
+				+ "," + distLeft + " | " + total;
 		}
 	}
 }
